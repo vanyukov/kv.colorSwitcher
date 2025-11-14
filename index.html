@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="Color Switcher - приложение для тренировки визуализации цветов">
+    <title>Color switcher</title>
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            transition: background-color 0.3s ease;
+        }
+
+        .box {
+            display: flex;
+            gap: 16px;
+        }
+
+        @media (max-width: 1023px) {
+            .box {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                padding: 0 16px;
+            }
+
+            .buttons-container {
+                width: 100%;
+                max-width: 600px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .stopwatch-container {
+                width: 100%;
+                max-width: 360px;
+            }
+
+            .color-button {
+                min-width: 120px;
+                flex: 1 1 140px;
+            }
+        }
+        
+        .buttons-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        
+        .color-button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            min-width: 120px;
+        }
+        
+        .color-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .stopwatch-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        
+        .stopwatch-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stopwatch-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .stopwatch-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        
+        .stopwatch-button:hover {
+            background-color: #555;
+        }
+        
+        .stopwatch-button.start {
+            background-color: #00a000;
+        }
+        
+        .stopwatch-button.start:hover {
+            background-color: #00c000;
+        }
+        
+        .stopwatch-button.stop {
+            background-color: #d00000;
+        }
+        
+        .stopwatch-button.stop:hover {
+            background-color: #ff0000;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease-out;
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hide {
+            animation: slideOut 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <h1>Выберите цвет</h1>
+    <div class="box">
+        <div class="buttons-container">
+            <button class="color-button" style="background-color: #ff0000;" onclick="changeColor('#ff0000')">Красный</button>
+            <button class="color-button" style="background-color: #ff7f00;" onclick="changeColor('#ff7f00')">Оранжевый</button>
+            <button class="color-button" style="background-color: #ffff00; color: #333;" onclick="changeColor('#ffff00')">Жёлтый</button>
+            <button class="color-button" style="background-color: #00ff00; color: #333;" onclick="changeColor('#00ff00')">Зелёный</button>
+            <button class="color-button" style="background-color: #007cff;" onclick="changeColor('#007cff')">Голубой</button>
+            <button class="color-button" style="background-color: #0000ff;" onclick="changeColor('#0000ff')">Синий</button>
+            <button class="color-button" style="background-color: #a0f;" onclick="changeColor('#a0f')">Фиолетовый</button>
+        </div>
+
+        <div class="stopwatch-container">
+            <h2>Секундомер</h2>
+            <div class="stopwatch-display" id="stopwatch">00:00:00</div>
+            <div class="stopwatch-controls">
+                <button class="stopwatch-button start" onclick="startStopwatch()">Старт</button>
+                <button class="stopwatch-button stop" onclick="stopStopwatch()">Стоп</button>
+                <button class="stopwatch-button" onclick="resetStopwatch()">Сброс</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toast функция
+        function showToast(message, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // PWA - Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => showToast('✓ Service Worker зарегистрирован'))
+                .catch(error => showToast('✗ Ошибка регистрации Service Worker'));
+        }
+
+        function changeColor(color) {
+            document.body.style.backgroundColor = color;
+        }
+
+        // Секундомер
+        let stopwatchInterval;
+        let stopwatchRunning = false;
+        let stopwatchTime = 0;
+        
+        function updateStopwatchDisplay() {
+            const hours = Math.floor(stopwatchTime / 3600);
+            const minutes = Math.floor((stopwatchTime % 3600) / 60);
+            const seconds = stopwatchTime % 60;
+            
+            const display = document.getElementById('stopwatch');
+            display.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function startStopwatch() {
+            if (!stopwatchRunning) {
+                stopwatchRunning = true;
+                stopwatchInterval = setInterval(() => {
+                    stopwatchTime++;
+                    updateStopwatchDisplay();
+                }, 1000);
+            }
+        }
+        
+        function stopStopwatch() {
+            if (stopwatchRunning) {
+                stopwatchRunning = false;
+                clearInterval(stopwatchInterval);
+            }
+        }
+        
+        function resetStopwatch() {
+            stopStopwatch();
+            stopwatchTime = 0;
+            updateStopwatchDisplay();
+        }
+        
+        // Инициализация отображения секундомера
+        updateStopwatchDisplay();
+    </script>
+</body>
+</html>
